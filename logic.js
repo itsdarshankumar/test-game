@@ -4,37 +4,37 @@ canvas.height = window.innerHeight;
 
 var c = canvas.getContext("2d");
 var i=0;
-var x, y, r = 30;
+var x, y, radius_bird = 30;
 var vx_box, vy_bird;
 let highscore=0;
 x = 200;
 y = innerHeight/3;
 vx_box = 5;
 vy_bird = 10 * (Math.random() - Math.random());
-let w = 20, g = 0.35;
+let gravity = 0.35;
 canvas.addEventListener('click', function (event) {
     vy_bird = -7;
 }, false);
 canvas.addEventListener('click', function (event) {
-    if(gameOver===2)
+    if(gameState===2)
     {
         if(score>localStorage.getItem(1)){
             localStorage.setItem(1,score);
         }
         highscore=localStorage.getItem(1);
-        gameOver=1;
+        gameState=1;
         restart();
     }
 }, false);
 let count = 0,score=0,time=0;
-let x_box = [], dev = [];
-dev.push(Math.random(-1000, 1000));
-let gameOver = 3;
+let x_box = [], deviation = [];
+deviation.push(Math.random(-1000, 1000));
+let gameState = 3;
+let startTime=new Date();
 function animate() {
-    if (gameOver === 1) {
-        time++;
-        if(time%10==0)
-            score++;
+    if (gameState === 1) {
+        let timeNow=new Date();
+        score=Math.floor((timeNow-startTime)/100);
         requestAnimationFrame(animate);
         c.clearRect(0,0,innerWidth,innerHeight);
         c.fillStyle="skyblue";
@@ -42,36 +42,40 @@ function animate() {
         c.beginPath();
         c.strokeStyle="skyblue";
         c.fillStyle="#ff5601";
-        c.arc(x, y, r, 0, 2 * Math.PI, false);
+        c.arc(x, y, radius_bird, 0, 2 * Math.PI, false);
         c.fill();
         y += vy_bird;
-        vy_bird += g;
-        if (y + r > innerHeight) {
+        vy_bird += gravity;
+        if (y + radius_bird > innerHeight) {
             vy_bird = 0;
-            y = innerHeight - r;
+            y = innerHeight - radius_bird;
         }
         count++;
         let num = 75;
         if (count % num === 0) {
             count = 0;
             x_box.push(innerWidth);
-            dev.push(200 * Math.random() - 100);
+            deviation.push(200 * Math.random() - 100);
         }
         let i, w = 60;
-        let box_height = 3 * r, box_height_center = innerHeight / 2;
-        if(box_height > 2.3*r) box_height*=0.99;
+        let box_gap = 3 * radius_bird, box_height_center = innerHeight / 2;
+        if(box_gap > 2.3*radius_bird) box_gap*=0.99;
         for (i in x_box) {
-            box_height_center = innerHeight / 2 + dev[i];
+            box_height_center = innerHeight / 2 + deviation[i];
             x_box[i] -= vx_box;
-            if (x_box[i] <= -25 * num - w) {
+            if (x_box[i] <= -5 * num - w) {
                 x_box.splice(i, 1);
-                dev.splice(i, 1);
+                deviation.splice(i, 1);
+                console.log("Working");
             }
             c.fillStyle="green";
-            c.fillRect(x_box[i], box_height + box_height_center, w, innerHeight);
-            c.fillRect(x_box[i], 0, w, box_height_center - box_height);
-            if (x_box[i] < x + r && x_box[i] + w > x - r && (y - r < box_height_center - box_height || y + r > box_height_center + box_height) ||(y === innerHeight - r )) {
-                gameOver = 2;
+            c.fillRect(x_box[i], box_gap + box_height_center, w, innerHeight);
+            c.fillRect(x_box[i], 0, w, box_height_center - box_gap);
+            if (x_box[i] < x + radius_bird && x_box[i] + w > x - radius_bird 
+                && (y - radius_bird < box_height_center - box_gap 
+                || y + radius_bird > box_height_center + box_gap) 
+                ||(y === innerHeight - radius_bird )) {
+                gameState = 2;
             }
         }
         c.fillStyle="blue";
@@ -81,7 +85,7 @@ function animate() {
         c.fillText("score: "+score,innerWidth/2,90);
         c.fillText("HighScore: "+highscore,innerWidth/2,50);
     }
-    else if(gameOver===2){
+    else if(gameState===2){
         c.fillStyle="#00000077";
         c.fillRect(0,0,innerWidth,innerHeight);
         c.fill();
@@ -94,7 +98,7 @@ function animate() {
         c.fillStyle="grey";
         c.fillText("Left click to start a new game",innerWidth/2,innerHeight/2+45);
     }
-    else if(gameOver===3)
+    else if(gameState===3)
     {
         x = 200;
         y = innerHeight/3;
@@ -103,7 +107,7 @@ function animate() {
         c.beginPath();
         c.strokeStyle="skyblue";
         c.fillStyle="#ff5601";
-        c.arc(x, y, r, 0, 2 * Math.PI, false);
+        c.arc(x, y, radius_bird, 0, 2 * Math.PI, false);
         c.fillStyle="#00000077";
         c.fillRect(0,0,innerWidth,innerHeight);
         c.fill();
@@ -115,9 +119,10 @@ function animate() {
         }
         highscore=localStorage.getItem(1);
         canvas.addEventListener('click', function (event) {
-            if(gameOver===3)
+            if(gameState===3)
             {
-                gameOver=1;
+                startTime=new Date();
+                gameState=1;
                 animate();
             }
         }, false);
@@ -125,11 +130,12 @@ function animate() {
 }
 function restart()
 {
+    startTime=new Date();
     x = 200;
     y = innerHeight/3;
     x_box=[];
-    dev=[];
-    dev.push(200 * Math.random() - 100);
+    deviation=[];
+    deviation.push(200 * Math.random() - 100);
     x_box.push(innerWidth);
     count = 0;
     vx_box = 5;
