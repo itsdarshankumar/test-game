@@ -1,11 +1,11 @@
-var canvas = document.querySelector('canvas');
+let canvas = document.querySelector('canvas');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-var c = canvas.getContext("2d");
-var i=0;
-var x, y, radius_bird = 30;
-var vx_box, vy_bird;
+let c = canvas.getContext("2d");
+let i=0;
+let x, y, radius_bird = 30;
+let vx_box, vy_bird;
 let highscore=0;
 x = 200;
 y = innerHeight/3;
@@ -31,6 +31,12 @@ let x_box = [], deviation = [];
 deviation.push(Math.random(-1000, 1000));
 let gameState = 3;
 let startTime=new Date();
+const bird=new Image();
+bird.src='Assets/Birmd.png';
+const pipes=new Image();
+pipes.src='Assets/pipes.png';
+const pipes2=new Image();
+pipes2.src='Assets/pipes2.png';
 function animate() {
     if (gameState === 1) {
         let timeNow=new Date();
@@ -42,7 +48,7 @@ function animate() {
         c.beginPath();
         c.strokeStyle="skyblue";
         c.fillStyle="#ff5601";
-        c.arc(x, y, radius_bird, 0, 2 * Math.PI, false);
+        c.drawImage(bird,x-radius_bird,y-radius_bird,2*radius_bird,2*radius_bird);
         c.fill();
         y += vy_bird;
         vy_bird += gravity;
@@ -68,9 +74,8 @@ function animate() {
                 deviation.splice(i, 1);
                 console.log("Working");
             }
-            c.fillStyle="green";
-            c.fillRect(x_box[i], box_gap + box_height_center, w, innerHeight);
-            c.fillRect(x_box[i], 0, w, box_height_center - box_gap);
+            c.drawImage(pipes,x_box[i], box_gap + box_height_center, w, innerHeight);
+            c.drawImage(pipes2,x_box[i],box_height_center-box_gap-innerHeight , w, innerHeight);
             if (x_box[i] < x + radius_bird && x_box[i] + w > x - radius_bird 
                 && (y - radius_bird < box_height_center - box_gap 
                 || y + radius_bird > box_height_center + box_gap) 
